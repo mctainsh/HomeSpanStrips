@@ -18,6 +18,7 @@ struct DEV_RgbLED : DEV_Base
 	DEV_RgbLED()
 	  : DEV_Base()
 	{
+		_name = "RGB LED";
 		POWER = new Characteristic::On(false, true);
 		H = new Characteristic::Hue(0, true);			// instantiate the Hue Characteristic with an initial value of 0 out of 360
 		S = new Characteristic::Saturation(0, true);	// instantiate the Saturation Characteristic with an initial value of 0%
@@ -37,7 +38,7 @@ struct DEV_RgbLED : DEV_Base
 
 		float r, g, b;
 		LedPin::HSVtoRGB(h, s / 100.0, 1, &r, &g, &b);	// since HomeKit provides S and V in percent, scale down by 100
-//LedPin::HSVtoRGB(h, s / 100.0, _powerLevel / 100.0, &r, &g, &b);  // since HomeKit provides S and V in percent, scale down by 100
+//LedPin::HSVtoRGB(h, s / 100.0, _finalPowerLevel / 100.0, &r, &g, &b);  // since HomeKit provides S and V in percent, scale down by 100
 //LedPin::HSVtoRGB(h, s / 100.0, 1, &r, &g, &b);	// since HomeKit provides S and V in percent, scale down by 100
 
 // Swap RED and Green for W2815 (12V)

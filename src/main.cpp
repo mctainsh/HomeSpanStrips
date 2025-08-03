@@ -2,9 +2,9 @@
 
 /*********************************************************************************
    Setup notes
-    1) Setup WIFI credentials
- 	2) Increase Partition size with Tools -> Partition size -> Minimal Spiffs (Or Huge APP)
-	3) Clear memory (ONLY IF NEW). Tools -> Erase All Flast before upload -> Enable 
+	1) Setup WIFI credentials
+	2) Increase Partition size with Tools -> Partition size -> Minimal Spiffs (Or Huge APP)
+	3) Clear memory (ONLY IF NEW). Tools -> Erase All Flast before upload -> Enable
 	4) Set Library versions
 		HomeSpan 2.1.0
 		Adafruit_NeoPixel 1.12.4
@@ -15,6 +15,9 @@
 
  ********************************************************************************/
 
+float _currentPowerLevel = 0;	  // Powerlevel we have currently set
+unsigned long _timeOfPowerChange; // Time of the last change in power level
+
 #include <Adafruit_NeoPixel.h>
 #include "HomeSpan.h"
 #include "DEV_RainbowStrip.h"
@@ -24,10 +27,11 @@
 
 Adafruit_NeoPixel g_strip(PIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-boolean _powerOn = false;
+bool _powerOn = false;	// Strip power is on
+bool _firstLoop = true; // First loop after setup
 
-DEV_RainbowStrip* _pRainbowStrip = NULL;
-DEV_RgbLED* _pRgbStrip = NULL;
+DEV_RainbowStrip *_pRainbowStrip = NULL;
+DEV_RgbLED *_pRgbStrip = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // Turn on a single pixel
@@ -49,48 +53,84 @@ int MakePulseColour(int offset = 0)
 // Startup
 void setup()
 {
-	Serial.begin(115200);
+	esp_log_level_set("*", ESP_LOG_VERBOSE); // Set log level to INFO for all components
 
-	TurnOnStrip(true);
-	g_strip.begin();						// INITIALIZE NeoPixel strip object (REQUIRED)
-	g_strip.show();							// Turn OFF all pixels ASAP
-	//g_strip.setBrightness(25);	// Set BRIGHTNESS to about 1/5 (max = 255)
-	g_strip.setBrightness(150);	// Set BRIGHTNESS to about 1/5 (max = 255)
+	// Disable the watchdog timer
+	// esp_task_wdt_delete(NULL); // Delete the default task watchdog
+	// esp_task_wdt_deinit();	   // Deinitialize the watchdog timer
 
-	Set(1, 255, 0, 0);
-	delay(250);
+	Serial.begin(115200); // Initialize serial communication for debugging
+	delay(100);			  // Wait for a short time to ensure the serial connection is established
+	Serial.setDebugOutput(true);
+	Serial.printf("Starting %s. Cores:%d\n", MY_VERSION, configNUM_CORES);
 
-	//	pinMode(STATUS_LED_PIN, OUTPUT);
-	int n = 0;
-	while(true)
+	// Record if WDT tripped
+	esp_reset_reason_t reason = esp_reset_reason();
+	Serial.printf("Watch Dog Timer (WDT) RESET Reason : %d"); // ESP_RST_TASK_WDT means task watchdog triggered
+
+	// Strip setup
+	g_strip.begin();		  // INITIALIZE NeoPixel strip object (REQUIRED)
+	g_strip.setBrightness(0); // Clear
+	g_strip.clear();		  // ..
+	g_strip.show();			  // Turn OFF all pixels ASAP
+
+	// If the last restart was brown out, turn off the strip for 5 seconds
+	if (reason == ESP_RST_BROWNOUT || reason == ESP_RST_PWR_GLITCH || reason == ESP_RST_POWERON)
 	{
-		int nV = analogRead(1);
-		float volts = 2 * nV * 3.3 / 4095.0; // Convert to voltage
-		Serial.printf("Analog read from GPIO 1: %d %d %.2f V                           %d\n", n, nV, volts, millis());
-
-		// Blink the status LED
-		Set(n++, 255, 255, 255);
-		delay(100);
-
-		if( n > 143)
+		Serial.println("Brownout detected, waiting 10 seconds before starting");
+		pinMode(STATUS_LED_PIN, OUTPUT);
+		const int BLINK_COUNT = 20;
+		for (int n = 1; n < BLINK_COUNT; n++)
 		{
-			n--;
-			while( n > 0)
-			{
-				Set(--n, 0, 0, 0);
-				delay(10);
-			}
+			digitalWrite(STATUS_LED_PIN, HIGH);
+			delay((BLINK_COUNT - n) * 50);
+			digitalWrite(STATUS_LED_PIN, LOW);
+			delay(n * 50);
 		}
 	}
 
+	TurnOnStrip(true);
+	g_strip.show();
+	g_strip.setBrightness(25); // Set BRIGHTNESS to about 1/5 (max = 255)
+
+	// One red pixel
+	Set(1, 255, 0, 0);
+	delay(250);
+
+	//// Testing
+	//// const int PIN_COUNT = 143;
+	// const int PIN_COUNT = 300;
+	// int n = 0;
+	// while (true)
+	// {
+	// 	g_strip.setBrightness(MIN(255, n)); // Set BRIGHTNESS to about 1/5 (max = 255)
+	// 	int nV = analogRead(1);
+	// 	float volts = 2 * nV * 3.3 / 4095.0; // Convert to voltage
+	// 	Serial.printf("Analog read from GPIO 1: %d %d %.2f V                           %d\n", n, nV, volts, millis());
+
+	// 	// Blink the status LED
+	// 	Set(n++, 255, 255, 255);
+	// 	delay(50);
+
+	// 	if (n > PIN_COUNT || volts < 3.5)
+	// 	{
+	// 		n--;
+	// 		while (n > 0)
+	// 		{
+	// 			Set(--n, 0, 0, 0);
+	// 			delay(10);
+	// 		}
+	// 	}
+	// }
+
 	// Setup homespan defaults
-	homeSpan.setStatusPin(STATUS_LED_PIN);		 // 9 Is blue, 10 is red
-	homeSpan.setStatusAutoOff(30);				 // Turn off status LED after 30 seconds
-	homeSpan.setControlPin(CONTROL_SWITCH_PIN);	 // 18 is nearest GND, 9 is PRG Button
+	homeSpan.setStatusPin(STATUS_LED_PIN);		// 9 Is blue, 10 is red
+	homeSpan.setStatusAutoOff(30);				// Turn off status LED after 30 seconds
+	homeSpan.setControlPin(CONTROL_SWITCH_PIN); // 18 is nearest GND, 9 is PRG Button
 
 	// Start the bridge
 	homeSpan.begin(Category::Bridges, BRIDGE_NAME);
-	
+
 	// Setup the parting code (Should be unique on the network)
 	homeSpan.setPairingCode(PARING_CODE);
 
@@ -139,19 +179,23 @@ void loop()
 
 	// If one is powering on and one off
 	// .. Cancel the power off and accept power ON
-	if (_pRainbowStrip->PoweringOn() && _pRgbStrip->PoweringOn())
+	if (_pRainbowStrip->IsPoweringOn() && _pRgbStrip->IsPoweringOn())
+	{
+		Serial.println("Both strips powering on. Power off RGB strip");
 		_pRgbStrip->PowerDown();
-
-	if (_pRainbowStrip->PoweringOn())
+	}
+	else if (_pRainbowStrip->IsPoweringOn())
+	{
+		Serial.println("Rainbow strip powering on. Power off RGB strip");
 		_pRgbStrip->PowerDown();
-
-	if (_pRgbStrip->PoweringOn())
+	}
+	else if (_pRgbStrip->IsPoweringOn())
+	{
+		Serial.println("RGB strip powering on. Power off Rainbow strip");
 		_pRainbowStrip->PowerDown();
+	}
 
 	delay(50);
-	//if( _pRainbowStrip->PoweringOn() && _pRgbStrip->PoweringOn())
-	//	_pRgbStrip-PowerDown();
-
 
 	// Set the power level
 	_pRainbowStrip->SetPowerlevel();
@@ -160,12 +204,14 @@ void loop()
 	if (_pRainbowStrip->_powerOn || _pRgbStrip->_powerOn)
 		TurnOnStrip(true);
 
-	// Turn off status lights at startup
-	if (!_pRainbowStrip->_powerOn && !_pRgbStrip->_powerOn && millis() > 5000)
+	// Turn off status lights 5 seconds after startup and 1 second after a change
+	auto t = millis();
+	if (!_pRainbowStrip->_powerOn && !_pRgbStrip->_powerOn && (_firstLoop || t - _timeOfPowerChange < 1000))
 	{
 		_pRainbowStrip->PowerDown();
 		_pRgbStrip->PowerDown();
 		TurnOnStrip(false);
+		_firstLoop = false;
 	}
 
 	// Draw the strip
@@ -177,14 +223,6 @@ void loop()
 	{
 		_pRgbStrip->Show(false);
 	}
-
-
-	// If stuff is still pending blink
-	//Set(0, MakePulseColour(), 0, 0);
-
-
-	//Set(1, _pRainbowStrip->_powerOn ? 255 : 0, 0, 0);
-	//Set(2, _pRgbStrip->_powerOn ? 255 : 0, 0, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

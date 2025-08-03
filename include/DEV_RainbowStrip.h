@@ -9,6 +9,7 @@ struct DEV_RainbowStrip : DEV_Base
 	DEV_RainbowStrip()
 	  : DEV_Base()
 	{
+		_name = "Rainbow Strip";
 		Serial.println("Configuring Dimmable LED");	 // initialization message
 		POWER = new Characteristic::On(false, true);
 		V = new Characteristic::Brightness(100, true);	// instantiate the Brightness Characteristic with an initial value of 100%
