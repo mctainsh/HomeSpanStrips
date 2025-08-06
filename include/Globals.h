@@ -1,13 +1,13 @@
 #pragma once
 
-#define MY_VERSION "6.80"
+#define MY_VERSION "6.81"
 
 // Duration of the fade
 #define POWER_FADE_MS 5000.0
 
 //#define PIXEL_COUNT 300
 
-// NOTE : W2815 (12V uinsg need to swap red and green in DEV_RebLed.h)
+// NOTE : W2815 (12V using need to swap red and green in DEV_RebLed.h)
 //#define IS_W2815_12V false
 
 #define NEO_RGB ((0 << 6) | (0 << 4) | (1 << 2) | (2)) ///< Transmit as R,G,B
@@ -121,8 +121,8 @@ const char* PARING_CODE = "46637726";
 // const char* SERIAL_NO   = "JRM.008.28"; // Study S1
 // const char* BRIDGE_NAME = "Study S1";
 // const char* PARING_CODE = "88880028";
-// #define MAX_BRIGHTNESS 100
-// #define PIXEL_COUNT 300
+// #define MAX_BRIGHTNESS 255
+// #define PIXEL_COUNT 141
 
 // const char* SERIAL_NO   = "JRM.008.29"; // V6 5V #1
 // const char* BRIDGE_NAME = "HSV6 5V No1";

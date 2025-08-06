@@ -15,8 +15,9 @@
 
  ********************************************************************************/
 
+float _finalPowerLevel = 0;		  // Power level to move toward
 float _currentPowerLevel = 0;	  // Powerlevel we have currently set
-unsigned long _timeOfPowerChange; // Time of the last change in power level
+//unsigned long _timeOfPowerChange; // Time of the last change in power level
 
 #include <Adafruit_NeoPixel.h>
 #include "HomeSpan.h"
@@ -91,7 +92,7 @@ void setup()
 
 	TurnOnStrip(true);
 	g_strip.show();
-	g_strip.setBrightness(25); // Set BRIGHTNESS to about 1/5 (max = 255)
+	g_strip.setBrightness(10); // Set BRIGHTNESS to about 5% (max = 255)
 
 	// One red pixel
 	Set(1, 255, 0, 0);
@@ -165,6 +166,14 @@ void setup()
 	_pRgbStrip = new DEV_RgbLED();
 
 	Set(5, 255, 0, 255);
+
+	// Turn Off the strip if nothing is on
+	delay(250);
+	if (!_pRainbowStrip->_powerOn && !_pRgbStrip->_powerOn)
+	{
+		Serial.println("Nothing is on. Turn off the strip");
+		TurnOnStrip(false);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,22 +186,21 @@ void loop()
 	if (_pRainbowStrip == NULL || _pRgbStrip == NULL)
 		return;
 
-	// If one is powering on and one off
-	// .. Cancel the power off and accept power ON
+	// If one is powering on power off the current one
 	if (_pRainbowStrip->IsPoweringOn() && _pRgbStrip->IsPoweringOn())
 	{
 		Serial.println("Both strips powering on. Power off RGB strip");
-		_pRgbStrip->PowerDown();
+		_pRgbStrip->ForcePowerDown();
 	}
 	else if (_pRainbowStrip->IsPoweringOn())
 	{
 		Serial.println("Rainbow strip powering on. Power off RGB strip");
-		_pRgbStrip->PowerDown();
+		_pRgbStrip->ForcePowerDown();
 	}
 	else if (_pRgbStrip->IsPoweringOn())
 	{
 		Serial.println("RGB strip powering on. Power off Rainbow strip");
-		_pRainbowStrip->PowerDown();
+		_pRainbowStrip->ForcePowerDown();
 	}
 
 	delay(50);
@@ -205,14 +213,14 @@ void loop()
 		TurnOnStrip(true);
 
 	// Turn off status lights 5 seconds after startup and 1 second after a change
-	auto t = millis();
-	if (!_pRainbowStrip->_powerOn && !_pRgbStrip->_powerOn && (_firstLoop || t - _timeOfPowerChange < 1000))
-	{
-		_pRainbowStrip->PowerDown();
-		_pRgbStrip->PowerDown();
-		TurnOnStrip(false);
-		_firstLoop = false;
-	}
+	// auto t = millis();
+	// if (!_pRainbowStrip->_powerOn && !_pRgbStrip->_powerOn && (_firstLoop || t - _timeOfPowerChange < 1000))
+	// {
+	// 	_pRainbowStrip->PowerDown();
+	// 	_pRgbStrip->PowerDown();
+	// 	TurnOnStrip(false);
+	// 	_firstLoop = false;
+	// }
 
 	// Draw the strip
 	if (_pRainbowStrip->_powerOn)
@@ -232,7 +240,7 @@ void TurnOnStrip(bool on)
 		return;
 	pinMode(STRIP_POWER, on ? OUTPUT : INPUT);
 
-	Serial.println(on ? "Turn OFF" : "Turn OFF");
+	Serial.println(on ? "Turn ON" : "Turn OFF");
 
 	if (on)
 		digitalWrite(STRIP_POWER, HIGH);
