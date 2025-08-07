@@ -93,18 +93,18 @@ const char* MANUFACTURER = "Secure Hub";
 //const char* PARING_CODE = "88880020";
 
 //const char* SERIAL_NO   = "JRM.008.21";	// Claudia's TV
-//const char* BRIDGE_NAME = "Claudias TV Lights";	
+//const char* BRIDGE_NAME = "Claudia's TV Lights";	
 //const char* PARING_CODE = "88880021";
 
 //const char* SERIAL_NO   = "JRM.008.23";	// Farm Curtain TV
 //const char* BRIDGE_NAME = "Farm Master Curtain 2";	
 //const char* PARING_CODE = "88880023";
 
-const char* SERIAL_NO   = "JRM.008.25"; 	// Master bedroom curtain
-const char* BRIDGE_NAME = "Master Curtain 1";
-const char* PARING_CODE = "46637726";
-#define PIXEL_COUNT 600
-#define MAX_BRIGHTNESS 255
+// const char* SERIAL_NO   = "JRM.008.25"; 	// Master bedroom curtain
+// const char* BRIDGE_NAME = "Master Curtain 1";
+// const char* PARING_CODE = "46637726";
+// #define PIXEL_COUNT 600
+// #define MAX_BRIGHTNESS 255
 
 //const char* SERIAL_NO   = "JRM.008.26";	// Long 12V strip
 //const char* BRIDGE_NAME = "Long 12V";	
@@ -124,11 +124,12 @@ const char* PARING_CODE = "46637726";
 // #define MAX_BRIGHTNESS 255
 // #define PIXEL_COUNT 141
 
-// const char* SERIAL_NO   = "JRM.008.29"; // V6 5V #1
-// const char* BRIDGE_NAME = "HSV6 5V No1";
-// const char* PARING_CODE = "88880029";
-// #define MAX_BRIGHTNESS 255
-// #define PIXEL_COUNT 300
+const char* SERIAL_NO   = "JRM.008.29"; // V6 5V #1 (Study S2)
+const char* BRIDGE_NAME = "HSV6 5V No1";
+const char* PARING_CODE = "88880029";
+#define MAX_BRIGHTNESS 255
+#define PIXEL_COUNT 300
+#define IS_W2815_12V 
 
 
 extern Adafruit_NeoPixel g_strip;

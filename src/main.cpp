@@ -205,22 +205,12 @@ void loop()
 
 	delay(50);
 
-	// Set the power level
-	_pRainbowStrip->SetPowerlevel();
-	_pRgbStrip->SetPowerlevel();
+	// Set the power level for one of the strips
+	if( !_pRainbowStrip->SetPowerlevel() )
+		_pRgbStrip->SetPowerlevel();
 
 	if (_pRainbowStrip->_powerOn || _pRgbStrip->_powerOn)
 		TurnOnStrip(true);
-
-	// Turn off status lights 5 seconds after startup and 1 second after a change
-	// auto t = millis();
-	// if (!_pRainbowStrip->_powerOn && !_pRgbStrip->_powerOn && (_firstLoop || t - _timeOfPowerChange < 1000))
-	// {
-	// 	_pRainbowStrip->PowerDown();
-	// 	_pRgbStrip->PowerDown();
-	// 	TurnOnStrip(false);
-	// 	_firstLoop = false;
-	// }
 
 	// Draw the strip
 	if (_pRainbowStrip->_powerOn)

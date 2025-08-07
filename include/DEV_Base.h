@@ -5,9 +5,6 @@
 #include "Arduino.h"
 #include "Globals.h"
 
-// extern float _currentPowerLevel = 0;
-// extern unsigned long _timeOfPowerChange;
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dimmable and colour changing
 struct DEV_Base : Service::LightBulb
@@ -17,13 +14,8 @@ struct DEV_Base : Service::LightBulb
 
 	bool _powerOn = false;
 
-	//float _currentBrightness = 0;	// Last saved brightness value
-	//float _lastGoodBrightness = 25; // Last good brightness value
-
 	bool _changeComplete = true;
 	const char *_name = "Base";
-
-	// unsigned int _powerDownCountTimeout = 0; // Timeout for power down. ONly call power time
 
 	DEV_Base()
 		: Service::LightBulb()
@@ -58,21 +50,22 @@ struct DEV_Base : Service::LightBulb
 	}
 
 	/////////////////////////////////////////////////////////////////////////////
-	// Get the powerlevel for the
-	void SetPowerlevel()
+	// Set the correct power level for the strip. 
+	//	Return true if power level processed
+	bool SetPowerlevel()
 	{
 		float voltage = GetVoltage();
 
 		// Has a change completed and power OK
 		if (_changeComplete && IsVoltageOK(voltage))
-			return;
+			return false;
 
 		Serial.printf("Set power %.0f%% -> %.0f%% %fV\n", _currentPowerLevel, _finalPowerLevel, voltage);
 
 		if (_currentPowerLevel > _finalPowerLevel)
 		{
 			// Dropping voltage
-			_currentPowerLevel -= 1;
+			_currentPowerLevel -= 2; // Decrease the power level by 2%
 			Serial.printf("1 %.0f%% -> %.0f%%\n", _currentPowerLevel, _finalPowerLevel);
 			if (_currentPowerLevel < _finalPowerLevel)
 				_currentPowerLevel = _finalPowerLevel;
@@ -103,19 +96,11 @@ struct DEV_Base : Service::LightBulb
 		// Turn off power if we are at zero
 		TurnOnStrip((_currentPowerLevel > 0));
 
-		// Settled in voltage check
+		// Set the strip brightness
 		g_strip.setBrightness((int)(_currentPowerLevel / 100.0 * MAX_BRIGHTNESS));
 
-		// // Not sure this will get caught
-		// if (!CheckVoltage(GetVoltage()))
-		// {
-		// 	Serial.printf("Post-check : Voltage too low. Stopping power UP\n");
-		// 	_currentPowerLevel -= 10; // Increase the power level by 10%
-		// 	_changeComplete = true;
-		// 	g_strip.setBrightness((int)(_currentPowerLevel / 100.0 * MAX_BRIGHTNESS));
-		// }
-
 		Show();
+		return true;
 	}
 
 	////////////////////////////////////////////////////////////////////////
@@ -138,16 +123,15 @@ struct DEV_Base : Service::LightBulb
 	}
 
 	////////////////////////////////////////////////////////////////////////
-	// Read the base setting
+	// Called when updates change. Read the base setting
 	void UpdateBase()
 	{
 		_powerOn = POWER->getVal();
-		//_finalPowerLevel = V->getVal();
+
 		Serial.printf("Power: %s\n", _name);
 		Serial.printf("\tNow : %s, Level: %.0f%%\n", _powerOn ? "ON" : "OFF", _currentPowerLevel);
 		if (POWER->updated())
 		{
-			//_timeOfPowerChange = millis();
 			_powerOn = POWER->getNewVal();
 			if (_powerOn)
 				_finalPowerLevel = V->getNewVal();
@@ -159,7 +143,6 @@ struct DEV_Base : Service::LightBulb
 
 		if (V->updated())
 		{
-			//_timeOfPowerChange = millis();
 			_finalPowerLevel = V->getNewVal();
 			_changeComplete = false;
 			Serial.printf("\tTo  : %s, Level: %.0f%%\n", _powerOn ? "ON" : "OFF", _finalPowerLevel);
