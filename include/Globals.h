@@ -1,6 +1,6 @@
 #pragma once
 
-#define MY_VERSION "6.81"
+#define MY_VERSION "6.83"
 
 // Duration of the fade
 #define POWER_FADE_MS 5000.0
@@ -29,7 +29,7 @@
 // LOLIN S2 Mini = 18
 #define NEOPIXEL_PIN  6	
 
-// Which input switchs the power onto the NeoPixels power?
+// Which input switches the power onto the NeoPixels power?
 // Version 3 = 5
 #define STRIP_POWER 5	    		
 
@@ -103,7 +103,7 @@ const char* MANUFACTURER = "Secure Hub";
 // const char* SERIAL_NO   = "JRM.008.25"; 	// Master bedroom curtain
 // const char* BRIDGE_NAME = "Master Curtain 1";
 // const char* PARING_CODE = "46637726";
-// #define PIXEL_COUNT 600
+// #define PIXEL_COUNT 300
 // #define MAX_BRIGHTNESS 255
 
 //const char* SERIAL_NO   = "JRM.008.26";	// Long 12V strip
@@ -118,18 +118,18 @@ const char* MANUFACTURER = "Secure Hub";
 //#define PIXEL_COUNT 600
 //#define IS_W2815_12V 
 
-// const char* SERIAL_NO   = "JRM.008.28"; // Study S1
-// const char* BRIDGE_NAME = "Study S1";
-// const char* PARING_CODE = "88880028";
-// #define MAX_BRIGHTNESS 255
-// #define PIXEL_COUNT 141
-
-const char* SERIAL_NO   = "JRM.008.29"; // V6 5V #1 (Study S2)
-const char* BRIDGE_NAME = "HSV6 5V No1";
-const char* PARING_CODE = "88880029";
+const char* SERIAL_NO   = "JRM.008.28"; // Study S1
+const char* BRIDGE_NAME = "Study S1";
+const char* PARING_CODE = "88880028";
 #define MAX_BRIGHTNESS 255
-#define PIXEL_COUNT 300
-#define IS_W2815_12V 
+#define PIXEL_COUNT (160*5) // 141
+
+// const char* SERIAL_NO   = "JRM.008.29"; // V6 5V #1 (Study S2)
+// const char* BRIDGE_NAME = "HSV6 5V No1";
+// const char* PARING_CODE = "88880029";
+// #define MAX_BRIGHTNESS 255
+// #define PIXEL_COUNT 300
+// #define IS_W2815_12V 
 
 
 extern Adafruit_NeoPixel g_strip;

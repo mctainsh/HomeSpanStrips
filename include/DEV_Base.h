@@ -65,10 +65,10 @@ struct DEV_Base : Service::LightBulb
 		if (_currentPowerLevel > _finalPowerLevel)
 		{
 			// Dropping voltage
-			_currentPowerLevel -= 2; // Decrease the power level by 2%
+			_currentPowerLevel -= 5; // Decrease the power level by 2%
 			Serial.printf("1 %.0f%% -> %.0f%%\n", _currentPowerLevel, _finalPowerLevel);
-			if (_currentPowerLevel < _finalPowerLevel)
-				_currentPowerLevel = _finalPowerLevel;
+			_currentPowerLevel = MAX( 0, _currentPowerLevel);
+			_currentPowerLevel = MAX( _finalPowerLevel, _currentPowerLevel);
 			Serial.printf("1 %.0f%% -> %.0f%%\n", _currentPowerLevel, _finalPowerLevel);
 		}
 		else
