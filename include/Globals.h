@@ -1,6 +1,6 @@
 #pragma once
 
-#define MY_VERSION "6.83"
+#define MY_VERSION "6.85"
 
 // Duration of the fade
 #define POWER_FADE_MS 5000.0
@@ -21,6 +21,9 @@
 //  88 = 2.9A on 308 LEDs
 // 188 = 3.8A on 308 LEDs smart
 //#define MAX_POWER	(127)
+
+// Which pin on the Arduino is connected to the voltage divider output?
+#define VOLTAGE_SENSE_PIN 1
 
 // Which input switch pin on the Arduino is connected to the NeoPixels?
 // Version 1 = 2
@@ -88,9 +91,9 @@ const char* MANUFACTURER = "Secure Hub";
 //const char* BRIDGE_NAME = "Christmas Lights";	
 //const char* PARING_CODE = "88880019";
 
-//const char* SERIAL_NO   = "JRM.008.20";	// Farm Master bedroom
-//const char* BRIDGE_NAME = "Farm Room Lights";	
-//const char* PARING_CODE = "88880020";
+// const char* SERIAL_NO   = "JRM.008.20";	// Broken : Netcomm 12V Long
+// const char* BRIDGE_NAME = "Farm Room Lights";	
+// const char* PARING_CODE = "88880020";
 
 //const char* SERIAL_NO   = "JRM.008.21";	// Claudia's TV
 //const char* BRIDGE_NAME = "Claudia's TV Lights";	
@@ -106,23 +109,25 @@ const char* MANUFACTURER = "Secure Hub";
 // #define PIXEL_COUNT 300
 // #define MAX_BRIGHTNESS 255
 
-//const char* SERIAL_NO   = "JRM.008.26";	// Long 12V strip
-//const char* BRIDGE_NAME = "Long 12V";	
-//const char* PARING_CODE = "88880026";
-//#define PIXEL_COUNT 600
-//#define IS_W2815_12V
+// const char* SERIAL_NO   = "JRM.008.26";	// Long 12V strip
+// const char* BRIDGE_NAME = "Long 12V";	
+// const char* PARING_CODE = "88880026";
+// #define MAX_BRIGHTNESS 255
+// #define PIXEL_COUNT 600
+// #define IS_W2815_12V
 
-//const char* SERIAL_NO   = "JRM.008.27"; 	// Farm 12V strip
-//const char* BRIDGE_NAME = "Long 12V";
-//const char* PARING_CODE = "88880027";
-//#define PIXEL_COUNT 600
-//#define IS_W2815_12V 
+// const char* SERIAL_NO   = "JRM.008.27"; 	// Farm 12V strip
+// const char* BRIDGE_NAME = "Long 12V";
+// const char* PARING_CODE = "88880027";
+// #define MAX_BRIGHTNESS 255
+// #define PIXEL_COUNT 600
+// #define IS_W2815_12V 
 
-const char* SERIAL_NO   = "JRM.008.28"; // Study S1
-const char* BRIDGE_NAME = "Study S1";
-const char* PARING_CODE = "88880028";
-#define MAX_BRIGHTNESS 255
-#define PIXEL_COUNT (160*5) // 141
+// const char* SERIAL_NO   = "JRM.008.28"; // Study S1
+// const char* BRIDGE_NAME = "Study S1";
+// const char* PARING_CODE = "88880028";
+// #define MAX_BRIGHTNESS 255
+// #define PIXEL_COUNT (160*5) // 141
 
 // const char* SERIAL_NO   = "JRM.008.29"; // V6 5V #1 (Study S2)
 // const char* BRIDGE_NAME = "HSV6 5V No1";
@@ -130,6 +135,19 @@ const char* PARING_CODE = "88880028";
 // #define MAX_BRIGHTNESS 255
 // #define PIXEL_COUNT 300
 // #define IS_W2815_12V 
+
+// const char* SERIAL_NO   = "JRM.008.30";	// Netcomm 12V Long
+// const char* BRIDGE_NAME = "Netcomm 12V Room Lights";	
+// const char* PARING_CODE = "88880030";
+// #define MAX_BRIGHTNESS 255
+// #define PIXEL_COUNT 600
+// #define IS_W2815_12V
+
+const char* SERIAL_NO   = "JRM.008.31"; 	// CLaudia's room lego cabinet 2
+const char* BRIDGE_NAME = "Lego Box 2";
+const char* PARING_CODE = "88880031";
+#define PIXEL_COUNT 300
+#define MAX_BRIGHTNESS 255
 
 
 extern Adafruit_NeoPixel g_strip;

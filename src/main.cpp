@@ -83,6 +83,7 @@ void setup()
 		const int BLINK_COUNT = 20;
 		for (int n = 1; n < BLINK_COUNT; n++)
 		{
+			Serial.printf("Blink %d\n", n);
 			digitalWrite(STATUS_LED_PIN, HIGH);
 			delay((BLINK_COUNT - n) * 50);
 			digitalWrite(STATUS_LED_PIN, LOW);
@@ -123,6 +124,18 @@ void setup()
 	// 		}
 	// 	}
 	// }
+
+	// Setup WiFi credentials
+	WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+	Serial.print("Connecting to WiFi ..");
+	while (WiFi.status() != WL_CONNECTED)
+	{
+		Serial.print('.');
+		Set(2, 255, 255, 0);
+		delay(500);
+		Set(2, 255, 0, 255);
+		delay(500);
+	}
 
 	// Setup homespan defaults
 	homeSpan.setStatusPin(STATUS_LED_PIN);		// 9 Is blue, 10 is red
@@ -221,6 +234,9 @@ void loop()
 	{
 		_pRgbStrip->Show(false);
 	}
+
+	// Set the strip off if the current power level is zero
+	TurnOnStrip((_currentPowerLevel > 0));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

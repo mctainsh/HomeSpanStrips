@@ -93,8 +93,8 @@ struct DEV_Base : Service::LightBulb
 		if (_currentPowerLevel == _finalPowerLevel)
 			_changeComplete = true;
 
-		// Turn off power if we are at zero
-		TurnOnStrip((_currentPowerLevel > 0));
+		//// Turn off power if we are at zero
+		//TurnOnStrip((_currentPowerLevel > 0));
 
 		// Set the strip brightness
 		g_strip.setBrightness((int)(_currentPowerLevel / 100.0 * MAX_BRIGHTNESS));
@@ -118,7 +118,7 @@ struct DEV_Base : Service::LightBulb
 	// Read the voltage
 	static float GetVoltage()
 	{
-		int nV = analogRead(1);
+		int nV = analogRead(VOLTAGE_SENSE_PIN);
 		return 2 * nV * 3.3 / 4095.0; // Convert to voltage
 	}
 
